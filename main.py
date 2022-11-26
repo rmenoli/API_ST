@@ -1,4 +1,5 @@
 from fastapi import FastAPI, status, Response
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -24,11 +25,14 @@ def get_closest_entity(entity_to_embed):
     return f'trying to emebed the entity {entity_to_embed}'
 
 
-@app.post('/addElement/{elem}',
+class PostBody(BaseModel):
+    entity: str
+
+@app.post('/addElement',
           tags=['Embeddings modification'],
-          description='Adds an element to de Db by embedding it')
-def add_element_embedding_space(elem, response: Response):
-    if elem == 'oldelem':
+          description='Adds an element to the Db')
+def add_element_embedding_space(body_request: PostBody, response: Response):
+    if body_request.entity == 'oldelem':
         response.status_code = status.HTTP_404_NOT_FOUND
         return 'element present'
     else:
@@ -36,8 +40,13 @@ def add_element_embedding_space(elem, response: Response):
         return 'element added'
 
 
-@app.post('/removeElement',
+@app.post('/removeElement/{elem}',
           tags=['Embeddings modification'],
           description='Removes an element already present in the DB')
-def remove_element_embedding_space():
-    return 'element removed'
+def remove_element_embedding_space(body_request: PostBody, response: Response):
+    if body_request.entity == 'newelem':
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return 'element not present'
+    else:
+        response.status_code = status.HTTP_200_OK
+        return 'element removed'
