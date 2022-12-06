@@ -7,6 +7,9 @@ name = "pypi"
 fastapi = "*"
 sentence-transformers = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+redis-om = "*"
+protobuf = "==3.20.1"
+toml = "*"
 
 [dev-packages]
 
