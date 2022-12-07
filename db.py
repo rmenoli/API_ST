@@ -1,10 +1,9 @@
 import redis
 from redis.commands.search.field import VectorField
 from redis.commands.search.query import Query
+from fastapi import HTTPException, status
 import numpy as np
 import toml
-
-from custom_exception import ValueAlreadyInDB, ValueNotInDB
 
 secrets = toml.load('secrets.toml')
 redis_client = redis.Redis(
@@ -17,13 +16,13 @@ INDEX_NAME = 'embedding_index'
 
 
 def get_list_all_keys():
-    return str(redis_client.keys())
+    return redis_client.keys()
 
 
 def add_element_to_key(elem_to_add, embeddings):
     keys_db = get_list_all_keys()
     if elem_to_add in keys_db:
-        raise ValueAlreadyInDB
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Element {elem_to_add} already in DB")
     np_vector = embeddings.astype(np.float32)
     redis_client.hset(elem_to_add, mapping={'v': np_vector.tobytes()})
 
@@ -31,7 +30,7 @@ def add_element_to_key(elem_to_add, embeddings):
 def remove_element(elemnt_to_remove):
     keys_db = get_list_all_keys()
     if elemnt_to_remove not in keys_db:
-        raise ValueNotInDB
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Element {elemnt_to_remove} not in DB")
     redis_client.delete(elemnt_to_remove)
 
 

@@ -1,9 +1,8 @@
-from fastapi import FastAPI, status, Response
+from fastapi import FastAPI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 
 from db import get_list_all_keys, add_element_to_key, remove_element, knn_search, remove_all_elements, generate_index
-from custom_exception import ValueAlreadyInDB, ValueNotInDB
 
 app = FastAPI()
 st = SentenceTransformer(
@@ -42,28 +41,19 @@ class PostBody(BaseModel):
 @app.post('/addElement',
           tags=['Embeddings modification'],
           description='Adds an element to the Db')
-def add_element_embedding_space(body_request: PostBody, response: Response):
+def add_element_embedding_space(body_request: PostBody):
     embeddings = embed_entity(body_request.entity)
-    try:
-        add_element_to_key(body_request.entity, embeddings)
-        response.status_code = status.HTTP_200_OK
-        return 'element added'
-    except ValueAlreadyInDB:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return f'{body_request.entity} already in DB'
+    add_element_to_key(body_request.entity, embeddings)
+    return 'element added'
+
 
 
 @app.post('/removeElement/{elem}',
           tags=['Embeddings modification'],
           description='Removes an element already present in the DB')
-def remove_element_embedding_space(body_request: PostBody, response: Response):
-    try:
-        remove_element(body_request.entity)
-        response.status_code = status.HTTP_200_OK
-        return 'element removed'
-    except ValueNotInDB:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return f'{body_request.entity} not in DB'
+def remove_element_embedding_space(body_request: PostBody):
+    remove_element(body_request.entity)
+    return 'element removed'
 
 @app.post('/removeAllElements',
           tags=['Embeddings modification'],
