@@ -1,15 +1,33 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
+from fastapi.responses import JSONResponse
+from fastapi import status
 
 from db import get_list_all_keys, add_element_to_key, remove_element, knn_search, remove_all_elements, generate_index
+from exception import ValueAlreadyInDB, ValueNotInDB
 
+# global values
 app = FastAPI()
 st = SentenceTransformer(
     '/Users/riccardomenoli/Documents/ontology_nnew/ontology-service/models/normalization-models/sentece-trasformers/cross-en-de-roberta-sentence-transformer')
 
+
+# utils function
 def embed_entity(entity):
     return st.encode([entity])[0]
+
+
+# exception handler
+@app.exception_handler(ValueAlreadyInDB)
+@app.exception_handler(ValueNotInDB)
+def handle_value_db_exception(request, exception):
+    response = JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={'detail': str(exception)}
+
+    )
+    return response
 
 
 @app.get('/',
@@ -47,13 +65,13 @@ def add_element_embedding_space(body_request: PostBody):
     return 'element added'
 
 
-
 @app.post('/removeElement/{elem}',
           tags=['Embeddings modification'],
           description='Removes an element already present in the DB')
 def remove_element_embedding_space(body_request: PostBody):
     remove_element(body_request.entity)
     return 'element removed'
+
 
 @app.post('/removeAllElements',
           tags=['Embeddings modification'],
