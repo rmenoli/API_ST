@@ -19,6 +19,7 @@ def embed_entity(entity):
 
 
 # exception handler
+# every time the code raise these exception, instead of return internal server error we return the resposne with the status code and the detail
 @app.exception_handler(ValueAlreadyInDB)
 @app.exception_handler(ValueNotInDB)
 def handle_value_db_exception(request, exception):
@@ -31,8 +32,8 @@ def handle_value_db_exception(request, exception):
 
 
 @app.get('/',
-         tags=['Health'],
-         description='Health endpoint')
+         tags=['Health'],  # tag for grouping in swagger
+         description='Health endpoint')  # description in swagger
 def health():
     return 'health'
 
@@ -47,7 +48,7 @@ def get_all_embedded_values():
 @app.get('/getClosestEntity/{entity_to_embed}',
          tags=['Embeddings exploration'],
          description='Get the closest entity in the DB closer to the inputted entity')
-def get_closest_entity(entity_to_embed):
+def get_closest_entity(entity_to_embed):  # get method takes parameter form the link (2 lines above)
     embeddings = embed_entity(entity_to_embed)
     return knn_search(embeddings, k=2)
 
@@ -59,7 +60,7 @@ class PostBody(BaseModel):
 @app.post('/addElement',
           tags=['Embeddings modification'],
           description='Adds an element to the Db')
-def add_element_embedding_space(body_request: PostBody):
+def add_element_embedding_space(body_request: PostBody): # post method takes parms from the body, defined above the elemnts of the Body
     embeddings = embed_entity(body_request.entity)
     add_element_to_key(body_request.entity, embeddings)
     return 'element added'
