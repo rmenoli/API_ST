@@ -10,6 +10,8 @@ uvicorn = {extras = ["standard"], version = "*"}
 redis-om = "*"
 protobuf = "==3.20.1"
 toml = "*"
+python-jose = "*"
+python-multipart = "*"
 
 [dev-packages]
 

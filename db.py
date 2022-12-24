@@ -2,11 +2,12 @@ import redis
 from redis.commands.search.field import VectorField
 from redis.commands.search.query import Query
 import numpy as np
-import toml
 
 from exception import ValueNotInDB, ValueAlreadyInDB
+import utils
 
-secrets = toml.load('secrets.toml')
+secrets = utils.get_secrets_from_secret_file()
+
 redis_client = redis.Redis(
     host=secrets['redis_host'],
     port=18815,
