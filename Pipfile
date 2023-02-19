@@ -12,6 +12,8 @@ protobuf = "==3.20.1"
 toml = "*"
 python-jose = "*"
 python-multipart = "*"
+streamlit = "*"
+requests = "*"
 
 [dev-packages]
 
