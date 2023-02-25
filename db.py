@@ -10,7 +10,7 @@ secrets = utils.get_secrets_from_secret_file()
 
 redis_client = redis.Redis(
     host=secrets['redis_host'],
-    port=18815,
+    port=18397,
     password=secrets['redis_password'],
     decode_responses=True
 )
