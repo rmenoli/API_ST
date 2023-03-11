@@ -10,7 +10,7 @@ secrets = utils.get_secrets_from_secret_file()
 
 redis_client = redis.Redis(
     host=secrets['redis_host'],
-    port=18397,
+    port=secrets['redis_port'],
     password=secrets['redis_password'],
     decode_responses=True
 )
@@ -52,5 +52,7 @@ def knn_search(embeddings, k=1):
 
 
 def generate_index():
-    schema = (VectorField("v", "FLAT", {"TYPE": "FLOAT32", "DIM": 768, "DISTANCE_METRIC": "COSINE"}),)
+    schema = (VectorField("v", "FLAT", {"TYPE": "FLOAT32",
+                                        "DIM": secrets['dim_embedding_space'],
+                                        "DISTANCE_METRIC": "COSINE"}),)
     redis_client.ft(INDEX_NAME).create_index(schema)

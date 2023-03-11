@@ -14,8 +14,8 @@ from auth import auth_endpoints
 app = FastAPI()
 app.include_router(auth_endpoints.router)
 
-st = SentenceTransformer(
-    '/Users/riccardomenoli/Documents/ontology_nnew/ontology-service/models/normalization-models/sentece-trasformers/cross-en-de-roberta-sentence-transformer')
+secrets = utils.get_secrets_from_secret_file()
+st = SentenceTransformer(secrets['path_sentence_transformer'])
 
 
 # exception handler
